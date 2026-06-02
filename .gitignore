@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# CocoaPods
+Pods/
+
+# Firebase / Secrets
+GoogleService-Info.plist
+*.env
+.env
+.env.*
+
+# Microsoft / API secrets
+*.secret
+Secrets.plist

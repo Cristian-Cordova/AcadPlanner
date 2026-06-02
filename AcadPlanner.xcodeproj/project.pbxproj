@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		8C3953302FCF794A00FE8874 /* AcadPlanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AcadPlanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C3953302FCF794A00FE8874 /* AcadPlanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = AcadPlanner.app; path = "/Users/cristiancordova/Desktop/Proyecto Oswaldo/AcadPlanner/build/Debug-iphoneos/AcadPlanner.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				8C3953322FCF794A00FE8874 /* AcadPlanner */,
-				8C3953312FCF794A00FE8874 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		8C3953312FCF794A00FE8874 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8C3953302FCF794A00FE8874 /* AcadPlanner.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,7 +86,7 @@
 			mainGroup = 8C3953272FCF794A00FE8874;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 8C3953312FCF794A00FE8874 /* Products */;
+			productRefGroup = 8C3953272FCF794A00FE8874;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (

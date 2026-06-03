@@ -8,7 +8,7 @@ import SwiftUI
 
 struct TaskListView: View {
     @StateObject private var viewModel: TaskListViewModel
-    @State private var isShowingTaskForm = false
+    @State private var formDestination: TaskFormDestination?
 
     private let taskRepository: TaskRepository
 
@@ -52,6 +52,14 @@ struct TaskListView: View {
                             .foregroundStyle(.secondary)
                         }
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false)
+                    {
+                        Button("Edit")
+                        {
+                            formDestination = .edit(task)
+                        }
+                        .tint(.blue)
+                    }
                 }
                 .onDelete
                 {
@@ -69,7 +77,7 @@ struct TaskListView: View {
                 {
                     Button
                     {
-                        isShowingTaskForm = true
+                        formDestination = .create
                     }
                     label:
                     {
@@ -78,12 +86,36 @@ struct TaskListView: View {
                     .accessibilityLabel("Add Task")
                 }
             }
-            .sheet(isPresented: $isShowingTaskForm, onDismiss:
+            .sheet(item: $formDestination, onDismiss:
                     {
                 viewModel.loadTasks()
             }) {
-                TaskFormView(taskRepository: taskRepository)
+                destination in
+                switch destination
+                {
+                case .create:
+                    TaskFormView(taskRepository: taskRepository)
+                case .edit(let task):
+                    TaskFormView(task: task, taskRepository: taskRepository)
+                }
             }
+        }
+    }
+}
+
+private enum TaskFormDestination: Identifiable
+{
+    case create
+    case edit(AcademicTask)
+    
+    var id: String
+    {
+        switch self
+        {
+        case .create:
+            return "create"
+        case .edit(let task):
+            return task.id.uuidString
         }
     }
 }

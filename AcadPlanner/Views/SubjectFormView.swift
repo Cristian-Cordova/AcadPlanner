@@ -11,9 +11,20 @@ struct SubjectFormView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: SubjectViewModel
     
+    private let subject: Subject?
+    
     @State private var name = ""
     @State private var professor = ""
     @State private var colorHex = "#3B82F6"
+    
+    init(viewModel: SubjectViewModel, subject: Subject? = nil)
+    {
+        self.viewModel = viewModel
+        self.subject = subject
+        _name = State(initialValue: subject?.name ?? "")
+        _professor = State(initialValue: subject?.professor ?? "")
+        _colorHex = State(initialValue: subject?.colorHex ?? "#3B82F6")
+    }
     
     var body: some View
     {
@@ -39,7 +50,7 @@ struct SubjectFormView: View {
                     }
                 }
             }
-            .navigationTitle("New Subject")
+            .navigationTitle(subject == nil ? "New Subject" : "Edit Subject")
             .toolbar
             {
                 ToolbarItem(placement: .cancellationAction)
@@ -55,6 +66,7 @@ struct SubjectFormView: View {
                     Button("Save")
                     {
                         if viewModel.saveSubject(
+                            subject: subject,
                             name: name,
                             professor: professor,
                             colorHex: colorHex

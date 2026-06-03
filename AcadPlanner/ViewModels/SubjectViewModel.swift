@@ -32,10 +32,16 @@ final class SubjectViewModel: ObservableObject
     }
     
     @discardableResult
-    func saveSubject(name: String, professor: String, colorHex: String = "#3B82F6") -> Subject?
+    func saveSubject(
+        subject: Subject? = nil,
+        name: String,
+        professor: String,
+        colorHex: String = "#3B82F6"
+    ) -> Subject?
     {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedProfessor = professor.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedColorHex = colorHex.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !trimmedName.isEmpty
         else
@@ -44,14 +50,17 @@ final class SubjectViewModel: ObservableObject
             return nil
         }
         
-        let subject = Subject(
+        let subjectToSave = Subject(
+            id: subject?.id ?? UUID(),
             name: trimmedName,
             professor: trimmedProfessor,
-            colorHex: colorHex,
+            colorHex: trimmedColorHex.isEmpty ? "#3B82F6" : trimmedColorHex,
+            createdAt: subject?.createdAt ?? Date(),
+            updatedAt: Date(),
             isSynced: false
         )
         
-        let savedSubject = subjectRepository.saveSubject(subject)
+        let savedSubject = subjectRepository.saveSubject(subjectToSave)
         validationMessage = nil
         loadSubjects()
         

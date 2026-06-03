@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SubjectListView: View {
     @StateObject private var viewModel = SubjectViewModel()
-    @State private var isShowingSubjectForm = false
+    @State private var formDestination: SubjectFormDestination?
     
     var body: some View
     {
@@ -25,6 +25,14 @@ struct SubjectListView: View {
                         Text(subject.professor)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false)
+                    {
+                        Button("Edit")
+                        {
+                            formDestination = .edit(subject)
+                        }
+                        .tint(.blue)
                     }
                 }
                 .onDelete
@@ -42,7 +50,7 @@ struct SubjectListView: View {
                 {
                     Button
                     {
-                        isShowingSubjectForm = true
+                        formDestination = .create
                     }
                     label:
                     {
@@ -51,14 +59,38 @@ struct SubjectListView: View {
                     .accessibilityLabel("Add Subject")
                 }
             }
-            .sheet(isPresented: $isShowingSubjectForm, onDismiss:
+            .sheet(item: $formDestination, onDismiss:
                     {
                 viewModel.loadSubjects()
             }
             )
             {
-                SubjectFormView(viewModel: viewModel)
+                destination in
+                switch destination
+                {
+                case .create:
+                    SubjectFormView(viewModel: viewModel)
+                case .edit(let subject):
+                    SubjectFormView(viewModel: viewModel, subject: subject)
+                }
             }
+        }
+    }
+}
+
+private enum SubjectFormDestination: Identifiable
+{
+    case create
+    case edit(Subject)
+    
+    var id: String
+    {
+        switch self
+        {
+        case .create:
+            return "create"
+        case .edit(let subject):
+            return subject.id.uuidString
         }
     }
 }

@@ -10,14 +10,15 @@ import SwiftUI
 struct DashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
     
-    var body: some View {
+    var body: some View
+    {
         NavigationStack
         {
             List
             {
                 Section("Overview")
                 {
-                    DashboardCard(title: "Upcoming Tasks", value: "\(viewModel.upComingTasks.count)")
+                    DashboardCard(title: "Upcoming Tasks", value: "\(viewModel.upcomingTasks.count)")
                     DashboardCard(title:"Pending Tasks", value: "\(viewModel.pendingTaskCount)")
                     DashboardCard(title:"Completed Tasks", value: "\(viewModel.completedTaskCount)")
                     DashboardCard(title:"Added to Calendar",value: "\(viewModel.calendarTaskCount)")
@@ -25,7 +26,7 @@ struct DashboardView: View {
                 
                 Section("Next Deadlines")
                 {
-                    ForEach(viewModel.upComingTasks)
+                    ForEach(viewModel.upcomingTasks)
                     {
                         task in VStack(alignment: .leading,spacing: 4)
                         {

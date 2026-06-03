@@ -18,7 +18,7 @@ enum MockRepositoryData
         Subject(id: iosDevelopmentSubjectId, name: "iOS Development", professor: "Prof. Rivera", colorHex: "#10B981", isSynced: true),
         Subject(id: databasesSubjectId, name: "Databases", professor: "Prof. Molina", colorHex: "#8B5CF6", isSynced: false)
     ]
-    
+}
     final class SubjectRepository
     {
         private var subjects: [Subject]
@@ -63,4 +63,4 @@ enum MockRepositoryData
             subjects.removeAll { $0.id == id }
         }
     }
-}
+

@@ -118,3 +118,10 @@ Instructor delivery report:
 ```text
 docs/final-delivery-report.md
 ```
+
+Spanish academic documentation:
+
+```text
+docs/documentacion-acadplanner-es.md
+docs/Documentacion_AcadPlanner.docx
+```

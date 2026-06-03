@@ -22,15 +22,18 @@ enum MockRepositoryData
 final class SubjectRepository
 {
     private let localDataSource: SQLiteSubjectDataSource
+    private let remoteDataSource: FirebaseSubjectDataSource
     private let seedInitialData: Bool
     private let initialDataSeedKey = "didSeedInitialSubjects"
     
     init(
         localDataSource: SQLiteSubjectDataSource = SQLiteSubjectDataSource(),
+        remoteDataSource: FirebaseSubjectDataSource = FirebaseSubjectDataSource(),
         seedInitialData: Bool = true
     )
     {
         self.localDataSource = localDataSource
+        self.remoteDataSource = remoteDataSource
         self.seedInitialData = seedInitialData
         seedInitialSubjectsIfNeeded()
     }
@@ -52,12 +55,16 @@ final class SubjectRepository
         subjectToSave.updatedAt = Date()
         subjectToSave.isSynced = false
         
-        return localDataSource.saveSubject(subjectToSave)
+        let savedSubject = localDataSource.saveSubject(subjectToSave)
+        syncSubjectWithFirebase(savedSubject)
+        
+        return savedSubject
     }
     
     func deleteSubject(id: UUID)
     {
         localDataSource.deleteSubject(id: id)
+        deleteSubjectFromFirebase(id: id)
     }
     
     private func seedInitialSubjectsIfNeeded()
@@ -76,5 +83,37 @@ final class SubjectRepository
         }
         
         UserDefaults.standard.set(true, forKey: initialDataSeedKey)
+    }
+    
+    private func syncSubjectWithFirebase(_ subject: Subject)
+    {
+        remoteDataSource.saveSubject(subject)
+        {
+            [weak self] result in
+            guard let self
+            else
+            {
+                return
+            }
+            
+            switch result
+            {
+            case .success(let syncedSubject):
+                DispatchQueue.main.async
+                {
+                    self.localDataSource.saveSubject(syncedSubject)
+                }
+            case .failure:
+                break
+            }
+        }
+    }
+    
+    private func deleteSubjectFromFirebase(id: UUID)
+    {
+        remoteDataSource.deleteSubject(id: id)
+        {
+            _ in
+        }
     }
 }

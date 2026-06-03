@@ -8,8 +8,58 @@
 import SwiftUI
 
 struct SubjectListView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    @StateObject private var viewModel = SubjectViewModel()
+    @State private var isShowingSubjectForm = false
+    
+    var body: some View
+    {
+        NavigationStack
+        {
+            List
+            {
+                ForEach(viewModel.subjects)
+                { subject in VStack(alignment: .leading, spacing: 4) {
+                        Text(subject.name)
+                            .font(.headline)
+                        
+                        Text(subject.professor)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .onDelete
+                { indexSet in indexSet
+                        .map
+                    { viewModel.subjects[$0].id }
+                        .forEach
+                    { viewModel.deleteSubject(id: $0) }
+                }
+            }
+            .navigationTitle("Subjects")
+            .toolbar
+            {
+                ToolbarItem(placement: .topBarTrailing)
+                {
+                    Button
+                    {
+                        isShowingSubjectForm = true
+                    }
+                    label:
+                    {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityLabel("Add Subject")
+                }
+            }
+            .sheet(isPresented: $isShowingSubjectForm, onDismiss:
+                    {
+                viewModel.loadSubjects()
+            }
+            )
+            {
+                SubjectFormView(viewModel: viewModel)
+            }
+        }
     }
 }
 

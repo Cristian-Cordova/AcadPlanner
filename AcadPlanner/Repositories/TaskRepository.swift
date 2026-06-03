@@ -10,15 +10,18 @@ import Foundation
 final class TaskRepository
 {
     private let localDataSource: SQLiteTaskDataSource
+    private let remoteDataSource: FirebaseTaskDataSource
     private let seedInitialData: Bool
     private let initialDataSeedKey = "didSeedInitialTasks"
 
     init(
         localDataSource: SQLiteTaskDataSource = SQLiteTaskDataSource(),
+        remoteDataSource: FirebaseTaskDataSource = FirebaseTaskDataSource(),
         seedInitialData: Bool = true
     )
     {
         self.localDataSource = localDataSource
+        self.remoteDataSource = remoteDataSource
         self.seedInitialData = seedInitialData
         seedInitialTasksIfNeeded()
     }
@@ -58,12 +61,16 @@ final class TaskRepository
         taskToSave.updatedAt = Date()
         taskToSave.isSynced = false
 
-        return localDataSource.saveTask(taskToSave)
+        let savedTask = localDataSource.saveTask(taskToSave)
+        syncTaskWithFirebase(savedTask)
+        
+        return savedTask
     }
 
     func deleteTask(id: UUID)
     {
         localDataSource.deleteTask(id: id)
+        deleteTaskFromFirebase(id: id)
     }
 
     @discardableResult
@@ -125,5 +132,37 @@ final class TaskRepository
                 isSynced: true
             )
         ]
+    }
+    
+    private func syncTaskWithFirebase(_ task: AcademicTask)
+    {
+        remoteDataSource.saveTask(task)
+        {
+            [weak self] result in
+            guard let self
+            else
+            {
+                return
+            }
+            
+            switch result
+            {
+            case .success(let syncedTask):
+                DispatchQueue.main.async
+                {
+                    self.localDataSource.saveTask(syncedTask)
+                }
+            case .failure:
+                break
+            }
+        }
+    }
+    
+    private func deleteTaskFromFirebase(id: UUID)
+    {
+        remoteDataSource.deleteTask(id: id)
+        {
+            _ in
+        }
     }
 }

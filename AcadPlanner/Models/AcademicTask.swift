@@ -20,7 +20,7 @@ struct AcademicTask: Identifiable, Codable, Equatable
     
     var microsoftEventId: String?
     var isAddedToCalendar: Bool
-    var calendarySyncStatus: CalendarSyncStatus
+    var calendarSyncStatus: CalendarSyncStatus
     
     var createdAt: Date
     var updatedAt: Date
@@ -37,7 +37,7 @@ struct AcademicTask: Identifiable, Codable, Equatable
         type: TaskType = .task,
         microsoftEventId: String? = nil,
         isAddedToCalendar: Bool = false,
-        calendarySyncStatus: CalendarSyncStatus = .notAdded,
+        calendarSyncStatus: CalendarSyncStatus = .notAdded,
         createdAt: Date = Date(),
         updatedAt: Date = Date(),
         isSynced: Bool = false
@@ -53,8 +53,7 @@ struct AcademicTask: Identifiable, Codable, Equatable
         self.type = type
         self.microsoftEventId = microsoftEventId
         self.isAddedToCalendar = isAddedToCalendar
-        self.isAddedToCalendar = isAddedToCalendar
-        self.calendarySyncStatus = calendarySyncStatus
+        self.calendarSyncStatus = calendarSyncStatus
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.isSynced = isSynced

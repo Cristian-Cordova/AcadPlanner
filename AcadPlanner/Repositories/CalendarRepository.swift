@@ -7,3 +7,12 @@
 
 import Foundation
 
+import Foundation
+
+final class CalendarRepository
+{
+    func addTaskToCalendar(_ task: AcademicTask) -> String
+    {
+        "mock-microsoft-event-\(task.id.uuidString)"
+    }
+}

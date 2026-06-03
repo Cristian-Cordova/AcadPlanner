@@ -7,10 +7,27 @@
 
 import Foundation
 
-final class CalendarRepository
-{
-    func addTaskToCalendar(_ task: AcademicTask) -> String
-    {
-        "mock-microsoft-event-\(task.id.uuidString)"
+final class CalendarRepository {
+    private let authService: GoogleAuthService
+    private let calendarService: GoogleCalendarService
+
+    init(
+        authService: GoogleAuthService = GoogleAuthService(),
+        calendarService: GoogleCalendarService = GoogleCalendarService()
+    ) {
+        self.authService = authService
+        self.calendarService = calendarService
+    }
+
+    func addTaskToCalendar(_ task: AcademicTask) async throws -> String {
+        let accessToken = try await authService.signIn()
+
+        return try await calendarService.createEvent(
+            accessToken: accessToken,
+            title: task.title,
+            notes: task.description,
+            startDate: task.dueDate,
+            endDate: task.dueDate.addingTimeInterval(3600)
+        )
     }
 }

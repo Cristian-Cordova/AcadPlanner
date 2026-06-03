@@ -22,8 +22,7 @@ final class TaskFormViewModel: ObservableObject
     private let task: AcademicTask?
     private let taskRepository: TaskRepository
 
-    init
-    (
+    init(
         task: AcademicTask? = nil,
         taskRepository: TaskRepository = TaskRepository()
     )
@@ -79,6 +78,11 @@ final class TaskFormViewModel: ObservableObject
         )
 
         validationMessage = nil
-        return taskRepository.saveTask(taskToSave)
+        let saved = taskRepository.saveTask(taskToSave)
+
+        // Bug 9 fix: notifica al dashboard para que actualice contadores y lista
+        NotificationCenter.default.post(name: .taskDataDidChange, object: nil)
+
+        return saved
     }
 }

@@ -19,48 +19,62 @@ enum MockRepositoryData
         Subject(id: databasesSubjectId, name: "Databases", professor: "Prof. Molina", colorHex: "#8B5CF6", isSynced: false)
     ]
 }
-    final class SubjectRepository
+final class SubjectRepository
+{
+    private let localDataSource: SQLiteSubjectDataSource
+    private let seedInitialData: Bool
+    private let initialDataSeedKey = "didSeedInitialSubjects"
+    
+    init(
+        localDataSource: SQLiteSubjectDataSource = SQLiteSubjectDataSource(),
+        seedInitialData: Bool = true
+    )
     {
-        private var subjects: [Subject]
-        
-        init(subjects: [Subject] = MockRepositoryData.subjects)
-        {
-            self.subjects = subjects
-        }
-        
-        func fetchSubjects() -> [Subject]
-        {
-            subjects.sorted
-            { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
-            }
-        }
-        
-        func fetchSubject(id: UUID) -> Subject?
-        {
-            subjects.first
-            { $0.id == id }
-        }
-        
-        @discardableResult
-        func saveSubject(_ subject: Subject) -> Subject
-        {
-            var subjectToSave = subject
-            subjectToSave.updatedAt = Date()
-            
-            if let index = subjects.firstIndex(where:{ $0.id == subject.id })
-            {
-                subjects[index] = subjectToSave
-            } else
-            {
-                subjects.append(subjectToSave)
-            }
-            
-            return subjectToSave
-        }
-        
-        func deleteSubject(id: UUID)
-        {
-            subjects.removeAll { $0.id == id }
-        }
+        self.localDataSource = localDataSource
+        self.seedInitialData = seedInitialData
+        seedInitialSubjectsIfNeeded()
     }
-
+    
+    func fetchSubjects() -> [Subject]
+    {
+        localDataSource.fetchSubjects()
+    }
+    
+    func fetchSubject(id: UUID) -> Subject?
+    {
+        localDataSource.fetchSubject(id: id)
+    }
+    
+    @discardableResult
+    func saveSubject(_ subject: Subject) -> Subject
+    {
+        var subjectToSave = subject
+        subjectToSave.updatedAt = Date()
+        subjectToSave.isSynced = false
+        
+        return localDataSource.saveSubject(subjectToSave)
+    }
+    
+    func deleteSubject(id: UUID)
+    {
+        localDataSource.deleteSubject(id: id)
+    }
+    
+    private func seedInitialSubjectsIfNeeded()
+    {
+        guard seedInitialData,
+              !UserDefaults.standard.bool(forKey: initialDataSeedKey),
+              localDataSource.fetchSubjects().isEmpty
+        else
+        {
+            return
+        }
+        
+        MockRepositoryData.subjects.forEach
+        {
+            localDataSource.saveSubject($0)
+        }
+        
+        UserDefaults.standard.set(true, forKey: initialDataSeedKey)
+    }
+}

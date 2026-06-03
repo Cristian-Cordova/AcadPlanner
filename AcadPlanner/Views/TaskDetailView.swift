@@ -26,6 +26,11 @@ struct TaskDetailView: View {
                     value: viewModel.task.dueDate.formatted(date: .abbreviated, time: .omitted)
                 )
             }
+            
+            Section("Subject") {
+                LabeledContent("Name", value: viewModel.subjectName)
+                LabeledContent("Professor", value: viewModel.professorName)
+            }
 
             Section("Description") {
                 Text(viewModel.task.description.isEmpty ? "No description provided." : viewModel.task.description)

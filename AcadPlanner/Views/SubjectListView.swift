@@ -28,6 +28,17 @@ struct SubjectListView: View {
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: false)
                     {
+                        Button(role: .destructive)
+                        {
+                            viewModel.deleteSubject(id: subject.id)
+                        }
+                        label:
+                        {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                    .swipeActions(edge: .leading, allowsFullSwipe: false)
+                    {
                         Button("Edit")
                         {
                             formDestination = .edit(subject)

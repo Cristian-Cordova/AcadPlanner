@@ -54,6 +54,17 @@ struct TaskListView: View {
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: false)
                     {
+                        Button(role: .destructive)
+                        {
+                            viewModel.deleteTask(id: task.id)
+                        }
+                        label:
+                        {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                    .swipeActions(edge: .leading, allowsFullSwipe: false)
+                    {
                         Button("Edit")
                         {
                             formDestination = .edit(task)

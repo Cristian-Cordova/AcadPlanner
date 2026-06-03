@@ -9,15 +9,30 @@
 /* Begin PBXBuildFile section */
 		8C99B9632FD03910004318C9 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8C99B9622FD03910004318C9 /* FirebaseCore */; };
 		8C99B9652FD03910004318C9 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8C99B9642FD03910004318C9 /* FirebaseFirestore */; };
+		8C99BA392FD0A483004318C9 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8C99BA382FD0A483004318C9 /* GoogleSignIn */; };
+		8C99BA3B2FD0A483004318C9 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8C99BA3A2FD0A483004318C9 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		8C99B9132FD03238004318C9 /* AcadPlanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AcadPlanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8C99BA3D2FD0A60F004318C9 /* Exceptions for "AcadPlanner" folder in "AcadPlanner" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 8C39532F2FCF794A00FE8874 /* AcadPlanner */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8C3953322FCF794A00FE8874 /* AcadPlanner */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8C99BA3D2FD0A60F004318C9 /* Exceptions for "AcadPlanner" folder in "AcadPlanner" target */,
+			);
 			path = AcadPlanner;
 			sourceTree = "<group>";
 		};
@@ -30,6 +45,8 @@
 			files = (
 				8C99B9632FD03910004318C9 /* FirebaseCore in Frameworks */,
 				8C99B9652FD03910004318C9 /* FirebaseFirestore in Frameworks */,
+				8C99BA392FD0A483004318C9 /* GoogleSignIn in Frameworks */,
+				8C99BA3B2FD0A483004318C9 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +83,8 @@
 			packageProductDependencies = (
 				8C99B9622FD03910004318C9 /* FirebaseCore */,
 				8C99B9642FD03910004318C9 /* FirebaseFirestore */,
+				8C99BA382FD0A483004318C9 /* GoogleSignIn */,
+				8C99BA3A2FD0A483004318C9 /* GoogleSignInSwift */,
 			);
 			productName = AcadPlanner;
 			productReference = 8C99B9132FD03238004318C9 /* AcadPlanner.app */;
@@ -97,6 +116,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8C99B9612FD03910004318C9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8C99BA372FD0A483004318C9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8C3953272FCF794A00FE8874;
@@ -260,6 +280,7 @@
 				DEVELOPMENT_TEAM = 89T5M6DBS3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AcadPlanner/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -292,6 +313,7 @@
 				DEVELOPMENT_TEAM = 89T5M6DBS3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AcadPlanner/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -346,6 +368,14 @@
 				minimumVersion = 12.14.0;
 			};
 		};
+		8C99BA372FD0A483004318C9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -358,6 +388,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8C99B9612FD03910004318C9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		8C99BA382FD0A483004318C9 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8C99BA372FD0A483004318C9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		8C99BA3A2FD0A483004318C9 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8C99BA372FD0A483004318C9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

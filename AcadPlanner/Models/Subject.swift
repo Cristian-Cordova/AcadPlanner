@@ -11,6 +11,7 @@ struct Subject: Identifiable, Codable, Equatable
 {
     let id: UUID
     var name: String
+    var proffesor: String
     var colorHex: String
     var createdAt: Date
     var updatedAt: Date
@@ -28,6 +29,7 @@ struct Subject: Identifiable, Codable, Equatable
     {
         self.id = id
         self.name = name
+        self.proffesor = professor
         self.colorHex = colorHex
         self.createdAt = createdAt
         self.updatedAt = updatedAt

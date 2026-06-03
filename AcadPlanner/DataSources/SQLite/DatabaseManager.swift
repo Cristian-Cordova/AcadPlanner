@@ -14,6 +14,9 @@ final class DatabaseManager {
     private let databaseFileName = "acadplanner.sqlite"
     private var database: OpaquePointer?
 
+    // Bug 7 fix: queue serial dedicado para serializar todos los accesos a SQLite
+    let dbQueue = DispatchQueue(label: "com.acadplanner.sqlite", qos: .userInitiated)
+
     var connection: OpaquePointer? {
         database
     }
@@ -27,11 +30,13 @@ final class DatabaseManager {
         sqlite3_close(database)
     }
 
+    // Bug 7 fix: prepareStatement ahora debe llamarse desde dentro de dbQueue.sync{}
+    // Los DataSources son responsables de envolver sus operaciones en dbQueue.sync{}
     func prepareStatement(_ query: String) -> OpaquePointer? {
         var statement: OpaquePointer?
 
         guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK else {
-            print("Unable to prepare SQLite statement.")
+            print("Unable to prepare SQLite statement: \(query)")
             return nil
         }
 
@@ -44,10 +49,15 @@ final class DatabaseManager {
         if sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK {
             sqlite3_step(statement)
         } else {
-            print("Unable to prepare SQLite statement.")
+            print("Unable to prepare SQLite statement: \(query)")
         }
 
         sqlite3_finalize(statement)
+    }
+
+    // Bug 7 fix: helper para ejecutar un bloque de forma thread-safe
+    func sync<T>(_ block: () -> T) -> T {
+        dbQueue.sync(execute: block)
     }
 
     private func openDatabase() {
@@ -59,6 +69,11 @@ final class DatabaseManager {
             print("Unable to open SQLite database.")
             return
         }
+
+        // Habilitar WAL mode para mejor concurrencia lectura/escritura
+        execute("PRAGMA journal_mode=WAL;")
+        // Habilitar foreign keys
+        execute("PRAGMA foreign_keys=ON;")
     }
 
     private func createTables() {
@@ -78,7 +93,6 @@ final class DatabaseManager {
             is_synced INTEGER NOT NULL
         );
         """
-
         execute(query)
     }
 
@@ -102,7 +116,6 @@ final class DatabaseManager {
             FOREIGN KEY(subject_id) REFERENCES subjects(id)
         );
         """
-
         execute(query)
     }
 }

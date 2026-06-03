@@ -7,57 +7,71 @@
 
 import Foundation
 
-final class TaskRepository {
-    private var tasks: [AcademicTask]
+final class TaskRepository
+{
+    private let localDataSource: SQLiteTaskDataSource
+    private let seedInitialData: Bool
+    private let initialDataSeedKey = "didSeedInitialTasks"
 
-    init(tasks: [AcademicTask] = TaskRepository.makeMockTasks()) {
-        self.tasks = tasks
+    init(
+        localDataSource: SQLiteTaskDataSource = SQLiteTaskDataSource(),
+        seedInitialData: Bool = true
+    )
+    {
+        self.localDataSource = localDataSource
+        self.seedInitialData = seedInitialData
+        seedInitialTasksIfNeeded()
     }
 
-    func fetchTasks() -> [AcademicTask] {
-        tasks.sorted { $0.dueDate < $1.dueDate }
+    func fetchTasks() -> [AcademicTask]
+    {
+        localDataSource.fetchTasks()
     }
 
-    func fetchTask(id: UUID) -> AcademicTask? {
-        tasks.first { $0.id == id }
+    func fetchTask(id: UUID) -> AcademicTask?
+    {
+        localDataSource.fetchTask(id: id)
     }
 
-    func fetchTasks(for subjectId: UUID) -> [AcademicTask] {
-        fetchTasks().filter { $0.subjectId == subjectId }
+    func fetchTasks(for subjectId: UUID) -> [AcademicTask]
+    {
+        localDataSource.fetchTasks(for: subjectId)
     }
 
-    func fetchTasks(status: TaskStatus) -> [AcademicTask] {
+    func fetchTasks(status: TaskStatus) -> [AcademicTask]
+    {
         fetchTasks().filter { $0.status == status }
     }
 
-    func fetchUpcomingTasks(limit: Int = 5) -> [AcademicTask] {
+    func fetchUpcomingTasks(limit: Int = 5) -> [AcademicTask]
+    {
         fetchTasks()
-            .filter { $0.status != .completed }
+            .filter { $0.status != .completed && $0.dueDate >= Date() }
             .prefix(limit)
             .map { $0 }
     }
 
     @discardableResult
-    func saveTask(_ task: AcademicTask) -> AcademicTask {
+    func saveTask(_ task: AcademicTask) -> AcademicTask
+    {
         var taskToSave = task
         taskToSave.updatedAt = Date()
+        taskToSave.isSynced = false
 
-        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-            tasks[index] = taskToSave
-        } else {
-            tasks.append(taskToSave)
-        }
-
-        return taskToSave
+        return localDataSource.saveTask(taskToSave)
     }
 
-    func deleteTask(id: UUID) {
-        tasks.removeAll { $0.id == id }
+    func deleteTask(id: UUID)
+    {
+        localDataSource.deleteTask(id: id)
     }
 
     @discardableResult
-    func updateCalendarState(taskId: UUID, microsoftEventId: String, status: CalendarSyncStatus = .added) -> AcademicTask? {
-        guard var task = fetchTask(id: taskId) else {
+    func updateCalendarState(taskId: UUID, microsoftEventId: String, status: CalendarSyncStatus = .added) -> AcademicTask?
+    {
+        guard var task = fetchTask(id: taskId)
+        else
+        {
             return nil
         }
 
@@ -65,11 +79,31 @@ final class TaskRepository {
         task.isAddedToCalendar = status == .added
         task.calendarSyncStatus = status
         task.updatedAt = Date()
+        task.isSynced = false
 
         return saveTask(task)
     }
 
-    private static func makeMockTasks() -> [AcademicTask] {
+    private func seedInitialTasksIfNeeded()
+    {
+        guard seedInitialData,
+              !UserDefaults.standard.bool(forKey: initialDataSeedKey),
+              localDataSource.fetchTasks().isEmpty
+        else
+        {
+            return
+        }
+        
+        Self.makeMockTasks().forEach
+        {
+            localDataSource.saveTask($0)
+        }
+        
+        UserDefaults.standard.set(true, forKey: initialDataSeedKey)
+    }
+
+    private static func makeMockTasks() -> [AcademicTask]
+    {
         [
             AcademicTask(
                 subjectId: MockRepositoryData.iosDevelopmentSubjectId,

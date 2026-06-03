@@ -41,6 +41,10 @@ struct DashboardView: View {
                 }
             }
             .navigationTitle("AcadPlanner")
+            .onAppear
+            {
+                viewModel.loadDashboardData()
+            }
         }
     }
 }

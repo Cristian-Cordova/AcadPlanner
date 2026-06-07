@@ -30,7 +30,7 @@ struct TaskListView: View {
                 {
                     task in NavigationLink
                     {
-                        TaskDetailView(task: task)
+                        TaskDetailView(task: task, taskRepository: taskRepository)
                     }
                     label:
                     {
@@ -82,6 +82,10 @@ struct TaskListView: View {
                 }
             }
             .navigationTitle("Tasks")
+            .onAppear
+            {
+                viewModel.loadTasks()
+            }
             .toolbar
             {
                 ToolbarItem(placement: .topBarTrailing)
@@ -118,7 +122,7 @@ private enum TaskFormDestination: Identifiable
 {
     case create
     case edit(AcademicTask)
-    
+
     var id: String
     {
         switch self

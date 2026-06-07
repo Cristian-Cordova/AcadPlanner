@@ -10,8 +10,11 @@ import SwiftUI
 struct TaskDetailView: View {
     @StateObject private var viewModel: TaskDetailViewModel
 
-    init(task: AcademicTask) {
-        _viewModel = StateObject(wrappedValue: TaskDetailViewModel(task: task))
+    init(task: AcademicTask, taskRepository: TaskRepository = TaskRepository()) {
+        _viewModel = StateObject(wrappedValue: TaskDetailViewModel(
+            task: task,
+            taskRepository: taskRepository
+        ))
     }
 
     var body: some View {
@@ -37,18 +40,15 @@ struct TaskDetailView: View {
                     .foregroundStyle(viewModel.task.description.isEmpty ? .secondary : .primary)
             }
 
-            // Bug 2 fix: sección renombrada a Google Calendar (refleja la implementación real del MVP)
             Section("Google Calendar") {
                 LabeledContent("Calendar Status", value: viewModel.calendarStatusText)
 
-                // Bug 2 fix: addTaskToCalendar() → addToCalendar()
                 Button {
                     viewModel.addToCalendar()
                 } label: {
                     HStack {
                         Text("Add to Google Calendar")
                         Spacer()
-                        // Indicador de carga mientras se procesa
                         if viewModel.isAddingToCalendar {
                             ProgressView()
                                 .scaleEffect(0.8)
@@ -62,9 +62,16 @@ struct TaskDetailView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
+
+                if let calendarEventLink = viewModel.calendarEventLink {
+                    Link("Open in Google Calendar", destination: calendarEventLink)
+                }
             }
         }
         .navigationTitle("Task Detail")
+        .onAppear {
+            viewModel.reloadTask()
+        }
     }
 }
 

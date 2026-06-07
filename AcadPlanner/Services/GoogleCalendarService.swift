@@ -16,12 +16,12 @@ final class GoogleCalendarService {
         notes: String?,
         startDate: Date,
         endDate: Date
-    ) async throws -> String {
+    ) async throws -> CalendarEventResult {
         let requestBody = GoogleCalendarEventRequest(
             summary: title,
             description: notes,
-            start: GoogleCalendarEventDateTime(dateTime: startDate.rfc3339String),
-            end: GoogleCalendarEventDateTime(dateTime: endDate.rfc3339String)
+            start: GoogleCalendarEventDate(date: startDate.googleCalendarDateString),
+            end: GoogleCalendarEventDate(date: endDate.googleCalendarDateString)
         )
 
         var request = URLRequest(url: calendarEventsURL)
@@ -41,24 +41,32 @@ final class GoogleCalendarService {
         }
 
         let decodedResponse = try JSONDecoder().decode(GoogleCalendarEventResponse.self, from: data)
-        return decodedResponse.id
+        return CalendarEventResult(
+            id: decodedResponse.id,
+            htmlLink: decodedResponse.htmlLink.flatMap(URL.init(string:))
+        )
     }
+}
+
+struct CalendarEventResult {
+    let id: String
+    let htmlLink: URL?
 }
 
 private struct GoogleCalendarEventRequest: Encodable {
     let summary: String
     let description: String?
-    let start: GoogleCalendarEventDateTime
-    let end: GoogleCalendarEventDateTime
+    let start: GoogleCalendarEventDate
+    let end: GoogleCalendarEventDate
 }
 
-private struct GoogleCalendarEventDateTime: Encodable {
-    let dateTime: String
-    let timeZone = TimeZone.current.identifier
+private struct GoogleCalendarEventDate: Encodable {
+    let date: String
 }
 
 private struct GoogleCalendarEventResponse: Decodable {
     let id: String
+    let htmlLink: String?
 }
 
 enum GoogleCalendarError: LocalizedError {
@@ -76,9 +84,12 @@ enum GoogleCalendarError: LocalizedError {
 }
 
 private extension Date {
-    var rfc3339String: String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
+    var googleCalendarDateString: String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone.current
+        formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: self)
     }
 }

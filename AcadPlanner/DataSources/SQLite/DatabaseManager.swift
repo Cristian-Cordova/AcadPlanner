@@ -30,8 +30,7 @@ final class DatabaseManager {
         sqlite3_close(database)
     }
 
-    // Bug 7 fix: prepareStatement ahora debe llamarse desde dentro de dbQueue.sync{}
-    // Los DataSources son responsables de envolver sus operaciones en dbQueue.sync{}
+
     func prepareStatement(_ query: String) -> OpaquePointer? {
         var statement: OpaquePointer?
 

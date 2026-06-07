@@ -19,15 +19,19 @@ final class CalendarRepository {
         self.calendarService = calendarService
     }
 
-    func addTaskToCalendar(_ task: AcademicTask) async throws -> String {
+    func addTaskToCalendar(_ task: AcademicTask) async throws -> CalendarEventResult {
         let accessToken = try await authService.signIn()
+
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: task.dueDate)
+        let endDate = calendar.date(byAdding: .day, value: 1, to: startDate) ?? startDate.addingTimeInterval(86400)
 
         return try await calendarService.createEvent(
             accessToken: accessToken,
             title: task.title,
             notes: task.description,
-            startDate: task.dueDate,
-            endDate: task.dueDate.addingTimeInterval(3600)
+            startDate: startDate,
+            endDate: endDate
         )
     }
 }

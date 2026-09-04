@@ -4,6 +4,19 @@ AcadPlanner is an iOS academic task planner built with SwiftUI. It helps student
 
 The application follows an offline-first approach: data is stored locally with SQLite and backed up remotely with Firebase Cloud Firestore.
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/01-home.png" width="230" alt="AcadPlanner home dashboard">
+  <img src="docs/screenshots/02-tasks.png" width="230" alt="Academic task list">
+  <img src="docs/screenshots/03-task-detail.png" width="230" alt="Academic task details">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/04-subjects.png" width="230" alt="Subject management">
+  <img src="docs/screenshots/05-google-calendar.png" width="230" alt="Task created in Google Calendar">
+</p>
+
 ## Features
 
 - Create, view, update, and delete subjects.
@@ -143,6 +156,12 @@ AcadPlanner/
 └── AcadPlannerApp.swift
 
 docs/
+├── screenshots/
+│   ├── 01-home.png
+│   ├── 02-tasks.png
+│   ├── 03-task-detail.png
+│   ├── 04-subjects.png
+│   └── 05-google-calendar.png
 ├── mvp-scope.md
 ├── final-delivery-report.md
 ├── documentacion-acadplanner-es.md

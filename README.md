@@ -1,137 +1,274 @@
-#AcadPlanner
+# AcadPlanner
 
-AcadPlanner is an iOS application developed with SwiftUI to manage academic tasks by subject. It uses SQLite for local offline storage, Firebase Firestore for remote backup, and Google Calendar integration for academic task scheduling.
+AcadPlanner is an iOS academic task planner built with SwiftUI. It helps students organize subjects and assignments, review upcoming work, and add academic deadlines to Google Calendar.
 
-MVP Status
+The application follows an offline-first approach: data is stored locally with SQLite and backed up remotely with Firebase Cloud Firestore.
 
-The current MVP allows users to:
+## Features
 
-* Manage subjects.
-* Manage academic tasks.
-* View a dashboard.
-* Classify tasks by status, priority, and type.
-* Store data locally with SQLite.
-* Back up subjects and academic tasks with Firebase Firestore.
-* Add academic tasks to Google Calendar.
-* Persist calendar synchronization status locally and remotely.
+- Create, view, update, and delete subjects.
+- Create and manage academic tasks.
+- Organize tasks by subject.
+- Classify tasks by status, priority, and type.
+- Review upcoming assignments from a dashboard.
+- Store subjects and tasks locally with SQLite.
+- Back up local data to Firebase Cloud Firestore.
+- Authenticate users with Google Sign-In.
+- Create all-day task events in Google Calendar.
+- Persist calendar event identifiers and synchronization status locally and remotely.
+- Continue using the core task-management features without an internet connection.
 
-Current Implementation
+## Tech Stack
 
-* Subject records are stored locally in SQLite and backed up to the Firestore subjects collection.
-* AcademicTask records are stored locally in SQLite and backed up to the Firestore academic_tasks collection.
-* Repositories keep the app offline-first by saving locally before attempting Firebase backup.
-* Google Sign-In is used to authenticate the user before creating calendar events.
-* Google Calendar API is used to create all-day events for academic tasks.
-* Calendar event state is persisted through the task model after each calendar operation.
-* Microsoft Graph was considered during development but was replaced by Google Calendar because the required Microsoft Entra ID configuration was not available.
+| Area | Technologies |
+| --- | --- |
+| Language | Swift |
+| User Interface | SwiftUI |
+| Architecture | MVVM, repositories, services, and data sources |
+| Local Persistence | SQLite |
+| Cloud Storage | Firebase Core and Cloud Firestore |
+| Authentication | Google Sign-In |
+| Calendar Integration | Google Calendar API |
+| Dependency Management | Swift Package Manager |
+| Development Tools | Xcode, Git, and GitHub |
 
-Out of Scope for This MVP
+## Architecture
 
-The initial version does not include weather, motivational quotes, holidays, full calendar reading, bidirectional calendar synchronization, recurring events, advanced notifications, user collaboration, App Store deployment, or production-grade authentication.
+AcadPlanner separates presentation, application state, data coordination, persistence, and external integrations.
 
-Architecture
-
-The project follows an architecture based on SwiftUI, MVVM, repositories, services, and data sources.
-
-Views
-↓
+```text
+SwiftUI Views
+      ↓
 ViewModels
-↓
+      ↓
 Repositories
-├── SQLite DataSources
-├── Firebase DataSources
-└── External Services
+├── SQLite Data Sources ─────→ SQLite Database
+├── Firebase Data Sources ───→ Cloud Firestore
+└── Calendar Repository
+    ├── GoogleAuthService ────→ Google Sign-In
+    └── GoogleCalendarService → Google Calendar API
+```
 
-The persistence flow is:
+The main responsibilities of each layer are:
 
+- **Views:** Render the interface and forward user interactions.
+- **ViewModels:** Manage screen state and coordinate user actions.
+- **Repositories:** Connect ViewModels with local, remote, and external data sources.
+- **SQLite Data Sources:** Perform local persistence and CRUD operations.
+- **Firebase Data Sources:** Back up subjects and tasks to Cloud Firestore.
+- **Services:** Handle authentication and Google Calendar API communication.
+
+## Data Flow
+
+### Local Persistence
+
+```text
 SwiftUI View
-↓
+      ↓
 ViewModel
-↓
+      ↓
 Repository
-↓
-SQLite DataSource
-↓
+      ↓
+SQLite Data Source
+      ↓
 SQLite Database
+```
 
-For remote backup:
+### Firebase Backup
 
+```text
 Repository
-↓
-Firebase DataSource
-↓
+      ↓
+Firebase Data Source
+      ↓
 Cloud Firestore
+```
 
-For Google Calendar integration:
+### Google Calendar Integration
 
+```text
 TaskDetailView
-↓
+      ↓
 TaskDetailViewModel
-↓
+      ↓
 CalendarRepository
-↓
+      ↓
 GoogleAuthService
-↓
+      ↓
 GoogleCalendarService
-↓
+      ↓
 Google Calendar API
-↓
-TaskDetailViewModel
-↓
+      ↓
 TaskRepository
-↓
-SQLite + Firebase
+      ↓
+SQLite + Cloud Firestore
+```
 
-This structure keeps SwiftUI views focused on presentation, ViewModels focused on screen state, repositories focused on coordination, and services focused on external integrations.
+## Offline-First Strategy
 
-Firebase Configuration
+When a subject or task is created or updated, the repository saves it locally before attempting a Firebase backup.
 
-Firebase uses GoogleService-Info.plist locally. This file is intentionally ignored by Git and must not be committed because it contains project configuration that should stay outside the public repository.
+This approach provides the following benefits:
 
-Google Calendar Configuration
+- Core features remain available without an internet connection.
+- Local operations are not blocked by network availability.
+- Records maintain synchronization information.
+- Firebase backup failures do not remove locally stored data.
 
-Google Calendar integration requires local Google configuration and OAuth setup.
+The current MVP performs remote backups but does not provide complete bidirectional synchronization or conflict resolution.
 
-The project uses:
+## Firestore Collections
 
-* Google Sign-In.
-* Google Calendar API.
-* iOS URL scheme configuration through Info.plist.
-* A local GoogleService-Info.plist file excluded from Git.
+The application uses the following Cloud Firestore collections:
 
-No client secrets, access tokens, refresh tokens, private keys, .env files, or secret configuration files should be embedded in the iOS app or committed to GitHub.
+- `subjects`
+- `academic_tasks`
 
-Microsoft Graph Status
+Each document uses the record UUID as its document identifier.
 
-Microsoft Graph calendar integration was originally considered at the architecture level, but real authentication and event creation were not activated because they require a Microsoft Entra ID app registration, a client ID, a redirect URI, and delegated calendar permissions.
+## Project Structure
 
-During development, the available Microsoft account did not have permission to create the required app registration or Microsoft 365 Developer sandbox. For this reason, the final MVP uses Google Calendar instead.
+```text
+AcadPlanner/
+├── Models/
+├── Views/
+├── ViewModels/
+├── Repositories/
+├── Services/
+├── DataSources/
+│   ├── SQLite/
+│   └── Firebase/
+├── Extensions/
+├── ContentView.swift
+└── AcadPlannerApp.swift
 
-Microsoft Graph could be reconsidered in the future if the required Microsoft Entra ID configuration becomes available.
+docs/
+├── mvp-scope.md
+├── final-delivery-report.md
+├── documentacion-acadplanner-es.md
+└── Documentacion_AcadPlanner.docx
+```
 
-Release
+## Getting Started
 
-Current academic MVP release:
+### Requirements
 
-v1.0.0-mvp
+To run the complete project, you need:
 
-Release title:
+- macOS.
+- Xcode with a compatible iOS SDK.
+- An iOS simulator or physical device.
+- A Firebase project configured for an iOS application.
+- Cloud Firestore enabled in Firebase.
+- Google Calendar API enabled in Google Cloud.
+- An OAuth client configured for Google Sign-In.
 
-AcadPlanner MVP - Final Academic Delivery
+### 1. Clone the Repository
 
-This release represents the final academic MVP delivery and is not intended to be a production-ready App Store version.
+```bash
+git clone https://github.com/Cristian-Cordova/AcadPlanner.git
+cd AcadPlanner
+```
 
-Documentation
+### 2. Open the Xcode Project
 
-Detailed MVP scope:
+```bash
+open AcadPlanner.xcodeproj
+```
 
-docs/mvp-scope.md
+Xcode should automatically resolve the Firebase and Google Sign-In dependencies through Swift Package Manager.
 
-Instructor delivery report:
+### 3. Configure Firebase
 
-docs/final-delivery-report.md
+1. Create or open a Firebase project.
+2. Register an iOS application using the appropriate bundle identifier.
+3. Enable Cloud Firestore.
+4. Download `GoogleService-Info.plist`.
+5. Add the file to the `AcadPlanner` target in Xcode.
 
-Spanish academic documentation:
+Without `GoogleService-Info.plist`, local SQLite features remain available, but Firebase backup is disabled.
 
-docs/documentacion-acadplanner-es.md
-docs/Documentacion_AcadPlanner.docx
+### 4. Configure Google Calendar
+
+1. Open the Google Cloud project associated with the application.
+2. Enable the Google Calendar API.
+3. Configure the OAuth consent screen.
+4. Create or configure an OAuth client for iOS.
+5. Verify that the client ID in `Info.plist` matches the Google configuration.
+6. Verify that the application URL scheme matches the reversed client ID.
+
+The application requests the following Google Calendar permission:
+
+```text
+https://www.googleapis.com/auth/calendar.events
+```
+
+This scope allows the application to create calendar events without requesting access to the user's complete calendar history.
+
+### 5. Run the Application
+
+1. Select an iOS simulator or connected device.
+2. Build the project.
+3. Run AcadPlanner from Xcode.
+4. Open a task and select **Add to Google Calendar** to test the calendar integration.
+
+## Security and Configuration
+
+`GoogleService-Info.plist` is excluded from Git and must not be committed to the public repository.
+
+The repository must not contain:
+
+- Access tokens.
+- Refresh tokens.
+- Private keys.
+- Client secrets.
+- Environment files.
+- Personal credentials.
+- Firebase service-account files.
+
+iOS OAuth client identifiers are application configuration rather than private server secrets, but they should still be restricted to the correct bundle identifier in Google Cloud.
+
+## Scope and Limitations
+
+This academic MVP focuses on:
+
+- Offline-first subject and task management.
+- Firebase backup.
+- One-way Google Calendar event creation.
+- Local and remote calendar synchronization status.
+
+The current version does not include:
+
+- Bidirectional calendar synchronization.
+- Reading or importing existing calendar events.
+- Recurring events.
+- Advanced notifications.
+- Multi-user collaboration.
+- Conflict resolution between local and remote records.
+- App Store deployment.
+- Production-grade user authentication.
+
+## Design Decision: Google Calendar
+
+Microsoft Graph was considered during the initial architecture phase. However, the required Microsoft Entra ID application registration and delegated calendar permissions were not available in the academic environment.
+
+Google Calendar was selected for the final MVP because the necessary OAuth configuration was available. The repository and service architecture keeps the calendar provider separated from the SwiftUI views, allowing another provider to be implemented in the future.
+
+## Release
+
+The current academic MVP release is:
+
+[AcadPlanner MVP — Final Academic Delivery](https://github.com/Cristian-Cordova/AcadPlanner/releases/tag/v1.0.0-mvp)
+
+This release represents the final academic MVP and is not intended to be a production-ready App Store version.
+
+## Documentation
+
+- [Detailed MVP scope](docs/mvp-scope.md)
+- [Final delivery report](docs/final-delivery-report.md)
+- [Spanish academic documentation](docs/documentacion-acadplanner-es.md)
+- [Spanish documentation in Word](docs/Documentacion_AcadPlanner.docx)
+
+## Author
+
+Developed by [Cristian Cordova](https://github.com/Cristian-Cordova) as an academic iOS development project.

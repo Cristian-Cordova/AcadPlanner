@@ -1,4 +1,4 @@
-AcadPlanner
+#AcadPlanner
 
 AcadPlanner is an iOS application developed with SwiftUI to manage academic tasks by subject. It uses SQLite for local offline storage, Firebase Firestore for remote backup, and Google Calendar integration for academic task scheduling.
 

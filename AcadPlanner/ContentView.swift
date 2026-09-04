@@ -9,22 +9,21 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-       TabView
-        {
-            DashboardView().tabItem
-            {
-                Label("Dashboard", systemImage: "chart.bar")
-            }
-            
-            TaskListView().tabItem
-            {
-                Label("Dashboard", systemImage: "checklist")
-            }
-            
-            SubjectListView().tabItem
-            {
-                Label("Subjects",systemImage: "books.vertical")
-            }
+        TabView {
+            DashboardView()
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
+
+            TaskListView()
+                .tabItem {
+                    Label("Tasks", systemImage: "checklist")
+                }
+
+            SubjectListView()
+                .tabItem {
+                    Label("Subjects", systemImage: "books.vertical")
+                }
         }
     }
 }
